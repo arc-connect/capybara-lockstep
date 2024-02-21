@@ -173,6 +173,7 @@ driver_specific_node_classes = [
   (Capybara::Selenium::SafariNode  if defined?(Capybara::Selenium::SafariNode)),
   (Capybara::Selenium::EdgeNode    if defined?(Capybara::Selenium::EdgeNode)),
   (Capybara::Selenium::IENode      if defined?(Capybara::Selenium::IENode)),
+  (Capybara::Playwright::Node      if defined?(Capybara::Playwright::Node)),
 ].compact.freeze
 
 # For other browsers (like the :remote browser) we instead get a generic node class.
