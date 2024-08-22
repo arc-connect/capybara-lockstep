@@ -1,4 +1,5 @@
 require 'byebug'
+require 'capybara-playwright-driver'
 require "capybara-lockstep"
 require 'capybara'
 require 'capybara/rspec'
@@ -30,7 +31,11 @@ Capybara.register_driver :chrome do |app|
   Capybara::Selenium::Driver.new(app, browser: :chrome, capabilities: [options])
 end
 
-Capybara.default_driver = :chrome
+Capybara.register_driver :playwright do |app|
+  Capybara::Playwright::Driver.new(app, browser_type: :chromium, headless: true, options: { viewport: { width: 1280, height: 1024 } })
+end
+
+Capybara.default_driver = :playwright
 
 Capybara.configure do |config|
   config.app = App

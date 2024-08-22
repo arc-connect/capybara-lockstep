@@ -17,3 +17,4 @@ gem 'byebug'
 gem 'gemika', '>= 0.8.1'
 gem 'capybara', '>= 3'
 gem 'selenium-webdriver', '>= 4'
+gem 'capybara-playwright-driver', require: false

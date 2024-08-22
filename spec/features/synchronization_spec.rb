@@ -327,11 +327,14 @@ describe 'synchronization' do
       HTML
 
       visit '/start'
-      page.find('a').click
-      page.accept_confirm('OK to proceed?')
+      page.accept_confirm('OK to proceed?') do
+        page.find('a').click
+      end
     end
 
     it 'does not crash if the click closes the window' do
+      pending "Playwright struggles with windows" if page.driver.class == Capybara::Playwright::Driver
+
       App.start_html = <<~HTML
         <a href="/start" target="_blank"">open window</a>
         <a href="#" onclick="window.close()"">close window</a>
