@@ -1,10 +1,9 @@
 module Capybara
   module Lockstep
-    class Client::Selenium < Client
-
+    class Client::Playwright < Client
       def with_synchronization_error_handling
         yield
-      rescue ::Selenium::WebDriver::Error::ScriptTimeoutError
+      rescue ::Playwright::TimeoutError
         timeout_message = "Could not synchronize client within #{timeout} seconds"
         log timeout_message
         if timeout_with == :error
@@ -13,26 +12,21 @@ module Capybara
           # Don't raise an error, this may happen if the server is slow to respond.
           # We will retry on the next Capybara synchronize call.
         end
-      rescue ::Selenium::WebDriver::Error::UnexpectedAlertOpenError
-        log ERROR_ALERT_OPEN
-        # Don't raise an error, this will happen in an innocent test where a click opens an alert.
-        # We will retry on the next Capybara synchronize call.
-      rescue ::Selenium::WebDriver::Error::NoSuchWindowError
+      rescue ::Playwright::TargetClosedError
         log ERROR_WINDOW_CLOSED
         # Don't raise an error, this will happen in an innocent test where a click closes a window.
         # We will retry on the next Capybara synchronize call.
-      rescue ::Selenium::WebDriver::Error::JavascriptError => e
-        # When the URL changes while a script is running, my current selenium-webdriver
-        # raises a Selenium::WebDriver::Error::JavascriptError with the message:
-        # "javascript error: document unloaded while waiting for result".
+      rescue ::Playwright::Error => e
+        # When the URL changes while a script is running, Playwright raises a Playwright::Error
+        # with a message indicating the page was navigated away.
         # We will retry on the next Capybara synchronize call, by then we should see
         # the new page.
-        if e.message.include?('unload')
+        if e.message.include?("unload")
           log ERROR_NAVIGATED_AWAY
         else
           unhandled_synchronize_error(e)
         end
-      rescue StandardError => e
+      rescue => e
         unhandled_synchronize_error(e)
       end
     end
