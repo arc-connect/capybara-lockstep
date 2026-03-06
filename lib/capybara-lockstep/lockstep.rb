@@ -6,7 +6,7 @@ module Capybara
       include PageAccess
 
       attr_accessor :synchronizing
-      alias synchronizing? synchronizing
+      alias_method :synchronizing?, :synchronizing
 
       def unsynchronize
         return if mode == :off
@@ -23,7 +23,7 @@ module Capybara
         end
       end
 
-      def synchronize(lazy: false, log: 'Synchronizing')
+      def synchronize(lazy: false, log: "Synchronizing")
         if synchronizing? || mode == :off
           return
         end
@@ -84,13 +84,14 @@ module Capybara
           Client::Selenium
         elsif cuprite_driver?
           Client::Cuprite
+        elsif playwright_driver?
+          Client::Playwright
         else
           # This should never raise, as capybara lockstep should disable itself for any unsupported driver.
           # When it still does, there is probably a bug within capybara lockstep.
           raise DriverNotSupportedError, "The driver #{driver.class.name} is not supported by capybara-lockstep."
         end
       end
-
     end
   end
 end
