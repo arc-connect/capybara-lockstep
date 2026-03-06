@@ -4,7 +4,9 @@ playwright_loaded = begin
   if Selenium::WebDriver::VERSION < '4.0.0'
     raise "capybara-lockstep requires selenium-webdriver >= 4.0.0"
   end
+  true
 rescue LoadError
+  false
 end
 
 selenium_loaded = begin
@@ -45,4 +47,5 @@ require_relative 'capybara-lockstep/server'
 require_relative 'capybara-lockstep/client'
 require_relative 'capybara-lockstep/client/selenium'
 require_relative 'capybara-lockstep/client/cuprite'
+require_relative 'capybara-lockstep/client/playwright'
 require_relative 'capybara-lockstep/middleware'
