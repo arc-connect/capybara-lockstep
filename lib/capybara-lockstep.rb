@@ -1,9 +1,6 @@
 require 'capybara'
 playwright_loaded = begin
-  require 'selenium-webdriver'
-  if Selenium::WebDriver::VERSION < '4.0.0'
-    raise "capybara-lockstep requires selenium-webdriver >= 4.0.0"
-  end
+  require 'capybara/playwright'
   true
 rescue LoadError
   false
