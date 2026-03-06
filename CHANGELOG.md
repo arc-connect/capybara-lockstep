@@ -2,6 +2,37 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+# Unreleased changes
+
+## Breaking changes
+
+-
+
+## Compatible changes
+
+-
+
+
+## 2.3.1 - 2026-02-17
+
+### Compatible changes
+
+- Add tests for Ruby 4.0
+- Increase `required_ruby_version` and `activesupport` minimum version in gemspec so people
+  on legacy Ruby and Rails versions don't receive future upgrades
+- Drop tests and support for Ruby < 3 and Rails < 7
+- Drop dependency on `ruby2_keywords`
+
+# 2.3.0
+
+- Added support for cuprite as the capybara driver
+
+# 2.2.3
+
+- Requiring the gem no longer force-loads ActionView (#22)
+- Calling `visit(nil)` visits the root route instead of crashing (#21)
+- Tested against Ruby 3.4 (in addition to 2.7 and 3.2)
+
 
 # 2.2.2
 

@@ -86,7 +86,7 @@ describe 'synchronization' do
         command = ObservableCommand.new { page.find('a').click  }
         command.execute
 
-        wait(0.1.seconds).for { command }.to be_finished
+        wait(0.2.seconds).for { command }.to be_finished
 
         expect('img').to be_loaded_image
       end
@@ -113,7 +113,7 @@ describe 'synchronization' do
         command = ObservableCommand.new { page.find('a').click  }
         command.execute
 
-        wait(0.1.seconds).for { command }.to be_finished
+        wait(0.2.seconds).for { command }.to be_finished
 
         expect(server_spy).to_not have_received(:reached)
       end
@@ -183,34 +183,39 @@ describe 'synchronization' do
         command = ObservableCommand.new { page.find('a').click  }
         command.execute
 
-        wait(0.1.seconds).for { command }.to be_finished
+        wait(0.2.seconds).for { command }.to be_finished
       end
 
-      it 'does not wait for an iframe with [loading=lazy]' do
-        App.start_html = <<~HTML
+      unless Capybara.current_driver == :chrome_cuprite
+        # There seems to be a bug in cuprite/ferrum which does not allow us to insert a lazy iframe out of view.
+        # https://github.com/rubycdp/cuprite/issues/303
+
+        it 'does not wait for an iframe with [loading=lazy]' do
+          App.start_html = <<~HTML
           <a href="#" onclick="
             let iframe = document.createElement('iframe');
             iframe.setAttribute('loading', 'lazy');
-            iframe.src =' /next';
+            iframe.src = '/next';
             document.body.append(iframe);
           ">label</a>
 
           #{(1...500).map { |i| "<p>#{i}</p>" }.join}
         HTML
 
-        server_spy = double('server action', reached: nil)
+          server_spy = double('server action', reached: nil)
 
-        App.next_action = -> do
-          server_spy.reached
+          App.next_action = -> do
+            server_spy.reached
+          end
+
+          visit '/start'
+          command = ObservableCommand.new { page.find('a').click  }
+          command.execute
+
+          wait(0.2.seconds).for { command }.to be_finished
+
+          expect(server_spy).to_not have_received(:reached)
         end
-
-        visit '/start'
-        command = ObservableCommand.new { page.find('a').click  }
-        command.execute
-
-        wait(0.1.seconds).for { command }.to be_finished
-
-        expect(server_spy).to_not have_received(:reached)
       end
 
     end
@@ -314,22 +319,37 @@ describe 'synchronization' do
 
         command = ObservableCommand.new { page.find('a').click  }
         command.execute
-        wait(0.1.seconds).for { command }.to be_finished
+        wait(0.2.seconds).for { command }.to be_finished
 
         expect(evaluate_script('EFFECT')).to eq(123)
       end
 
     end
 
-    it 'does not close an alert that was opened on click' do
+    if Capybara.current_driver != :chrome_cuprite
+      # Alerts never stay open with cuprite, there is no option to configure this.
+
+      it 'does not close an alert that was opened on click' do
+        App.start_html = <<~HTML
+          <a href="#" onclick="confirm('OK to proceed?')">label</a>
+        HTML
+
+        visit '/start'
+        page.find('a').click
+        page.accept_confirm('OK to proceed?')
+      end
+    end
+
+    it 'does handle alerts with accept_confirm using a block to open the alert' do
       App.start_html = <<~HTML
         <a href="#" onclick="confirm('OK to proceed?')">label</a>
       HTML
 
       visit '/start'
-      page.accept_confirm('OK to proceed?') do
+      message = accept_confirm do
         page.find('a').click
       end
+      expect(message).to eq 'OK to proceed?'
     end
 
     it 'does not crash if the click closes the window' do
@@ -474,6 +494,16 @@ describe 'synchronization' do
       JS
 
       expect(busy).to be(false)
+    end
+
+  end
+
+  describe 'navigating with #visit' do
+
+    it 'does not crash and visits the root route when called with nil' do
+      visit(nil)
+
+      expect(page).to have_content('Root page')
     end
 
   end

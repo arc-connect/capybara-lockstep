@@ -1,13 +1,31 @@
 require 'capybara'
-begin
+playwright_loaded = begin
   require 'selenium-webdriver'
   if Selenium::WebDriver::VERSION < '4.0.0'
     raise "capybara-lockstep requires selenium-webdriver >= 4.0.0"
   end
 rescue LoadError
 end
+
+selenium_loaded = begin
+  require 'selenium-webdriver'
+  true
+rescue LoadError
+  false
+end
+
+cuprite_loaded = begin
+  require 'capybara/cuprite'
+  true
+rescue LoadError
+  false
+end
+
+raise LoadError, "capybara-lockstep requires either selenium-webdriver, cuprite or playwright" unless selenium_loaded || cuprite_loaded || playwright_loaded
+
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/module/delegation'
+require 'active_support/lazy_load_hooks'
 
 module Capybara
   module Lockstep
@@ -25,4 +43,6 @@ require_relative 'capybara-lockstep/capybara_ext'
 require_relative 'capybara-lockstep/helper'
 require_relative 'capybara-lockstep/server'
 require_relative 'capybara-lockstep/client'
+require_relative 'capybara-lockstep/client/selenium'
+require_relative 'capybara-lockstep/client/cuprite'
 require_relative 'capybara-lockstep/middleware'

@@ -1,4 +1,24 @@
-# capybara-lockstep [![Tests](https://github.com/makandra/capybara-lockstep/actions/workflows/test.yml/badge.svg)](https://github.com/makandra/capybara-lockstep/actions)
+<p>
+  <a href="https://makandra.de/">
+    <picture>
+      <source media="(prefers-color-scheme: light)" srcset="media/makandra-with-bottom-margin.light.svg">
+      <source media="(prefers-color-scheme: dark)" srcset="media/makandra-with-bottom-margin.dark.svg">
+      <img align="right" width="25%" alt="makandra" src="media/makandra-with-bottom-margin.light.svg">
+    </picture>
+  </a>
+
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="media/logo.light.shapes.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="media/logo.dark.shapes.svg">
+    <img width="410" alt="capybara-lockstep" role="heading" aria-level="1" src="media/logo.light.shapes.svg">
+  </picture>
+</p>
+
+<p>
+  <a href="https://github.com/makandra/capybara-lockstep/actions">
+    <img alt="Tests" src="https://github.com/makandra/capybara-lockstep/actions/workflows/test.yml/badge.svg">
+  </a>
+</p>
 
 This Ruby gem synchronizes [Capybara](https://github.com/teamcapybara/capybara) commands with client-side JavaScript and AJAX requests. This greatly improves the stability of an end-to-end ("E2E") test suite, even if that suite has timing issues.
 
@@ -8,6 +28,8 @@ If you don't care you may **skip to [installation instructions](#installation)**
 
 Why are tests flaky?
 --------------------
+
+> Watch as a video: [▶️ Fixing Flaky E2E Tests](https://www.youtube.com/watch?v=LaCwiFDm2Vs)
 
 A naively written E2E test will have [race conditions](https://makandracards.com/makandra/47336-fixing-flaky-integration-tests) between the test script and the controlled browser. How often these timing issues will cause your tests to fail depends on luck and your machine's performance. You may not see these issues for years until a colleague runs your suite on their new laptop.
 
@@ -98,9 +120,9 @@ Installation
 Check if your application satisfies all requirements for capybara-lockstep:
 
 - Capybara 2.0 or higher.
-- Your Capybara driver must use [selenium-webdriver](https://rubygems.org/gems/selenium-webdriver/) 3.0 or higher. capybara-lockstep deactivates itself for any other driver.
+- Your Capybara driver must use [selenium-webdriver](https://rubygems.org/gems/selenium-webdriver/) (>3.0) or [cuprite](https://github.com/rubycdp/cuprite). capybara-lockstep deactivates itself for any other driver.
   There is a [fork](https://github.com/Skalar/capybara-lockstep/tree/playwright-driver) with support for [capybara-playwright-driver](https://github.com/YusukeIwaki/capybara-playwright-driver).
-- This gem was only tested with a Selenium-controlled Chrome browser. [Chrome in headless mode](https://makandracards.com/makandra/492109-running-capybara-tests-in-headless-chrome) is recommended, but not required.
+- This gem was only tested with a Chrome browser. [Chrome in headless mode](https://makandracards.com/makandra/492109-running-capybara-tests-in-headless-chrome) is recommended, but not required.
 - This gem was only tested with Rails, but there's no Rails dependency.
 
 
@@ -438,9 +460,21 @@ Pull requests are welcome on GitHub at <https://github.com/makandra/capybara-loc
 
 After checking out the repo, run `bin/setup` to install dependencies.
 
-Then, run `rake spec` to run the tests.
+For running tests see [Running tests locally](#running-tests-locally) below
 
 You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+
+### Running tests locally
+
+capybara-lockstep supports both the `selenium-webdriver` and `cuprite` as drivers for capybara.
+
+Make sure, your chromedriver version is up to date.
+
+To run all the tests for all supported drivers, run `rake spec:all`.
+
+To run all the tests for a specific driver, run `rake spec:selenium` or `rake spec:cuprite`.
+
+The driver can also be specified by setting `CAPYBARA_DRIVER`, so if you want to run a single test for cuprite you can run `CAPYBARA_DRIVER=cuprite bundle exec rspec "spec/features/spec_spec.rb[1]"`.
 
 ### Manually testing a change
 
@@ -454,9 +488,12 @@ As an alternative you may also install this gem onto your local machine by runni
 
 ### Releasing a new version
 
-- Update the version number in `version.rb`
- - Run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
- - If RubyGems publishing seems to freeze, try entering your OTP code.
+- Update the version number in `version.rb`. Use Semantic Versioning.
+- Run `bundle install` so our `Gemfile.lock` (for development) gets the new version.
+- Update `CHANGELOG.md`.
+- Commit and push your changes.
+- Run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+- If RubyGems publishing seems to freeze, try entering your OTP code.
 
 
 ## License
